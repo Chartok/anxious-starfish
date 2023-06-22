@@ -27,3 +27,5 @@ const ReactionSchema = new Schema({
         getters: true
     }
 });
+
+module.exports = Reaction;
