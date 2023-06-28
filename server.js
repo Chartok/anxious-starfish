@@ -7,6 +7,12 @@ const PORT = process.env.PORT || 3001;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// 'next' middleware centeralizing error handling
+app.use((err, req, res, next) => {
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: err.message });
+});
+
 app.use(routes);
 
 db.once('open', () => {
