@@ -1,0 +1,11 @@
+{
+  "name": "soc-net-api",
+  "version": "1.0.0",
+  "description": "social network api that creates, updates, and deletes users and their reactions/thoughts",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Chartok",
+  "license": "MIT"
+}
