@@ -1,4 +1,4 @@
-const router = express.Router();
+const router = require('express').Router();
 const { Thought } = require('../../models');
 
 // GET all thoughts
