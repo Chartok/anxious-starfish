@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const dateFormat = require('../utils/dateFormat');
-const ReactionSchema = require('./Reaction');
+const dateFormat = require('../utils/date-format');
 
 const ReactionSchema = new Schema({
     reactionId: {

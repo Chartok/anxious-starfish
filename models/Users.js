@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const dateFormat = require('../utils/dateFormat');
+const dateFormat = require('../utils/date-format');
 
 const UserSchema = new Schema({
     username: {
@@ -38,4 +38,4 @@ UserSchema.virtual('friendCount').get(function() {
 const User = mongoose.model('User', UserSchema);
 
 // Export the User model
-module.exports = User;
+module.exports = Users;
