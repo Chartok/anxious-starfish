@@ -1,19 +1,14 @@
 const { User, Thought } = require('../models');
+const { onSuccess, onError } = require('../utils/handlers');
 const HTTP_STATUS = require('../constants/httpStatus');
-
-// centralized error handling
-const handleError = (err, next) => {
-    console.error(err);
-    next(err);
-};
 
 const userController = {
     async getUsers(req, res, next) {
         try {
             const users = await User.find().select('-__v');
-            res.json(users);
+            onSuccess(res, users);
         } catch (err) {
-            handleError(err, next);
+            onError(err, req, res, next);
         }
     },
 
@@ -24,20 +19,22 @@ const userController = {
                 .populate('friends')
                 .populate('thoughts');
             if (!user) {
-                return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'No user with this id!' });
+                const error = new Error('No user found with this id!');
+                error.statusCode = HTTP_STATUS.NOT_FOUND;
+                throw error;
             }
-            res.json(user);
+            onSuccess(res, user);
         } catch (err) {
-            handleError(err, next);
+            onError(err, req, res, next);
         }
     },
 
     async createUser(req, res, next) {
         try {
             const user = await User.create(req.body);
-            res.json(user);
+            onSuccess(res, user, 'User created successfully!', HTTP_STATUS.CREATED);
         } catch (err) {
-            handleError(err, next);
+            onError(err, req, res, next);
         }
     },
 
@@ -49,11 +46,13 @@ const userController = {
                 { runValidators: true, new: true }
             );
             if (!user) {
-                return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'No user with this id!' });
+                const error = new Error('No user found with this id!');
+                error.statusCode = HTTP_STATUS.NOT_FOUND;
+                throw error;
             }
-            res.json(user);
+            onSuccess(res, user, 'User updated successfully!');
         } catch (err) {
-            handleError(err, next);
+            onError(err, req, res, next);
         }
     },
 
@@ -61,12 +60,14 @@ const userController = {
         try {
             const user = await User.findOneAndDelete({ _id: req.params.userId });
             if (!user) {
-                return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'No user with this id!' });
+                const error = new Error('No user found with this id!');
+                error.statusCode = HTTP_STATUS.NOT_FOUND;
+                throw error;
             }
             await Thought.deleteMany({ _id: { $in: user.thoughts } });
-            res.json({ message: 'User and associated thoughts deleted!' });
+            onSuccess(res, null, 'User and associated thoughts deleted!');
         } catch (err) {
-            handleError(err, next);
+            onError(err, req, res, next);
         }
     },
 
@@ -78,11 +79,13 @@ const userController = {
                 { new: true }
             );
             if (!user) {
-                return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'No user with this id!' });
+                const error = new Error('No user found with this id!');
+                error.statusCode = HTTP_STATUS.NOT_FOUND;
+                throw error;
             }
-            res.json(user);
+            onSuccess(res, user, 'Friend added successfully!');
         } catch (err) {
-            handleError(err, next);
+            onError(err, req, res, next);
         }
     },
 
@@ -94,11 +97,13 @@ const userController = {
                 { new: true }
             );
             if (!user) {
-                return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'No user with this id!' });
+                const error = new Error('No user found with this id!');
+                error.statusCode = HTTP_STATUS.NOT_FOUND;
+                throw error;
             }
-            res.json(user);
+            onSuccess(res, user, 'Friend removed successfully!');
         } catch (err) {
-            handleError(err, next);
+            onError(err, req, res, next);
         }
     },
 };
