@@ -13,7 +13,7 @@ const ThoughtSchema = new Schema({
         type: Date,
         default: Date.now,
         // Use a getter method to format the timestamp on query
-        get: createdAtVal => dateFormat(createdAtVal)
+        get: (createdAtVal) => dateFormat(createdAtVal)
     },
     username: {
         type: String,
@@ -36,8 +36,7 @@ ThoughtSchema.virtual('reactionCount').get(function() {
 }
 );
 
-// Create the Thought model using the ThoughtSchema
+// Create the Thought model using the ThoughtSchema and export the model
 const Thought = mongoose.model('Thought', ThoughtSchema);
 
-// Export the Thought model
 module.exports = Thought;
