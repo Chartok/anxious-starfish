@@ -1,88 +1,82 @@
 const router = require('express').Router();
-const { User } = require('../../models');
+const { User, Thought } = require('../../models');
+const { onSuccess, onError } = require('../../utils/handlers');
 
 // GET all users
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
-        const users = await User.find({});
-        res.json(users);
-        console.log('Users found successfully!');
+        onSuccess(res, await User.find({}), 'Users found successfully!');
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        err.statusCode = 500;
+        next(err);
     }
 });
 
 // GET a single user by its _id and populated thought and friend data
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
     try {
         const user = await User.findById(req.params.id).populate('thoughts').populate('friends');
-        if (!user) return res.status(404).json({ message: 'No user found with this id!' });
-        res.json(user);
-        console.log('User found successfully!');
+        if (!user) return onError(res, { message: 'No user found with this id!' }, 404);
+        onSuccess(res, user, 'User found successfully!');
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        err.statusCode = 500;
+        next(err);
     }
 });
 
 // Create a new user
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
     try {
-        const newUser = await User.create(req.body);
-        const user = await newUser.save();
-        res.status(201).json(user);
-        console.log('User created successfully!');
+        onSuccess(res, await User.create(req.body), 'User created successfully!', 201);
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        err.statusCode = 400;
+        next(err);
     }
 });
 
 // Update a user by its _id
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res, next) => {
     try {
-        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-        res.json(user);
-        console.log('User updated successfully!');
+        onSuccess(res, await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }), 'User updated successfully!');
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        err.statusCode = 400;
+        next(err);
     }
 });
 
 // DELETE a user by its _id
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
-        // delete all thoughts associated with this user
         await Thought.deleteMany({ username: user.username });
-        res.json(user);
-        console.log('User deleted successfully!');
+        onSuccess(res, user, 'User deleted successfully!');
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        err.statusCode = 500;
+        next(err);
     }
 });
 
 // POST to add a new friend to a user's friend list
-router.post('/:userId/friends/:friendId', async (req, res) => {
+router.post('/:userId/friends/:friendId', async (req, res, next) => {
     try {
-        const user = await User.findByIdAndUpdate(req.params.userId, { $addToSet: { friends: req.params.friendId } }, { new: true});
-
-        if (!user) return res.status(404).json({ message: 'No user found with this id!' });
-        res.json(user);
-        console.log('Friend added successfully!');
+        const user = await User.findByIdAndUpdate(req.params.userId, { $addToSet: { friends: req.params.friendId } }, { new: true });
+        if (!user) return onError(res, { message: 'No user found with this id!' }, 404);
+        onSuccess(res, user, 'Friend added successfully!');
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        err.statusCode = 400;
+        next(err);
     }
 });
 
 // DELETE to remove a friend from a user's friend list
-router.delete('/:userId/friends/:friendId', async (req, res) => {
+router.delete('/:userId/friends/:friendId', async (req, res, next) => {
     try {
-        const user = await User.findByIdAndUpdate(req.params.userId, { $pull: { friends: req.params.friendId } }, { new: true});
-
-        if (!user) return res.status(404).json({ message: 'No user found with this id!' });
-        res.json(user);
-        console.log('Friend removed successfully!');
+        const user = await User.findByIdAndUpdate(req.params.userId, { $pull: { friends: req.params.friendId } }, { new: true });
+        if (!user) return onError(res, { message: 'No user found with this id!' }, 404);
+        onSuccess(res, user, 'Friend removed successfully!');
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        err.statusCode = 400;
+        next(err);
     }
 });
 

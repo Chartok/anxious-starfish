@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ReactionSchema = require('./Reaction');
+const dateFormat = require('../utils/date-format');
 
 const ThoughtSchema = new Schema({
     thoughtText: {
@@ -36,7 +37,6 @@ ThoughtSchema.virtual('reactionCount').get(function() {
 }
 );
 
-// Create the Thought model using the ThoughtSchema and export the model
-const Thought = mongoose.model('Thought', ThoughtSchema);
+// Export the Thought model with the ThoughtSchema
+module.exports = mongoose.model('Thought', ThoughtSchema);
 
-module.exports = Thought;

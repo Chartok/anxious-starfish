@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const dateFormat = require('../utils/date-format');
 
 const UserSchema = new Schema({
     username: {
@@ -34,7 +33,5 @@ UserSchema.virtual('friendCount').get(function() {
     return this.friends.length;
 });
 
-// Create the User model using the UserSchema and export the model
-const Users = mongoose.model('User', UserSchema);
-
-module.exports = Users;
+// Export the User model with the UserSchema
+module.exports = mongoose.model('User', UserSchema);
